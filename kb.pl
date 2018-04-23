@@ -1,16 +1,18 @@
 %KB candidatos
-candidato(jose).
-candidato(antonio).
 candidato(meade).
-candidato(ricardo).
 candidato(anaya).
-candidato(andres).
-candidato(manuel).
-candidato(lopez).
-candidato(obrador).
 candidato(amlo).
 candidato(margarita).
-candidato(zavala).
+
+%KB candidatos segundo nombres
+meade(jose).
+meade(antonio).
+anaya(ricardo).
+amlo(andres).
+amlo(manuel).
+amlo(lopez).
+amlo(obrador).
+margarita(zavala).
 
 %kb sectores
 sector(corrupcion).
