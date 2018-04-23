@@ -1,7 +1,7 @@
 :- [propuestas, templates, kb].
 
 chat:-	writeln('Hola y bienvenido al chatbot de las elecciones, aqui podras encontrar informacion acerca de las propuestas
-	de los candidatos a la presidencia Mexico 2018. Menciona el candidato y el sector que te interesa sbaer?'),
+	de los candidatos a la presidencia Mexico 2018. Quieres hablar de un candidato en especial o de algun sector en especial?'),
 	readln(Input),
 	chat(Input),!.
 chat(Input):- Input == ['adios'],
@@ -9,22 +9,21 @@ chat(Input):- Input == ['adios'],
 chat(Input) :-
 	template(Stim, Resp, IndStim),
 	match(Stim, Input),
-	substitute(IndStim, Input, 0, Resp, R),
+	replace0(IndStim, Input, 0, Resp, R),
 	writeln(R),
 	readln(Input1),
 	chat(Input1), !.
 
 
-chatCandidato(X,R):- candidato(X) ->  R = ['No mencionase que sector te interesa saber de', X, '?' ];
-					sector(X) -> R = ['No mencionaste al candidato que te interesa saber del sector' , X].
+chatCandidato(X,R):- candidato(X) ->  R = ['Que sector te interesa saber de', X, '?' ];
+					sector(X) -> R = ['Sector:' , X].
 chatCandidato(X,R):- \+candidato(X), R = [X, 'no es un candidato o un sector'].
 
-chatSectores(X, R):-  sector(X), R = ['No mencionaste al candidato que te interesa saber del sector', X ].
+chatSectores(X, R):-  sector(X), R = ['elejiste el sector', X ].
 chatSectores(X, R):- \+sector(X), R = [X, 'no es un candidato o un sector'].
 
 chatPropuesta(X,Y, R):- propuesta(X,Y,Z), R = [Z]. 
-chatPropuesta(X,Y, R):- \+propuesta(X,Y,Z), R = ['No existe el candidato o el sector, puedes preguntar 
-	de nuevo, por los candidatos o los sectores']. 
+chatPropuesta(X,Y, R):- \+propuesta(X,Y,Z), R = ['no existe']. 
 
 match([],[]).
 match([], _):- true.
@@ -38,36 +37,38 @@ match([S|Stim],[_|Input]) :-
 	\+atom(S),
 	match(Stim, Input),!.
 
-substitute([], _, _, Resp, R):- append(Resp, [], R),!.
+replace0([], _, _, Resp, R):- append(Resp, [], R),!.
 
-substitute([I|Index], Input, N, Resp, R):-
+replace0([I|Index], Input, N, Resp, R):-
 	nth0(I, Input, Atom),
 	nth0(N, Resp, X),
 	X == flagCandidato,
 	chatCandidato(Atom, R).
 
-substitute([I|_], Input, _, Resp, R):-
+replace0([I|_], Input, _, Resp, R):-
 	nth0(I, Input, Atom),
 	nth0(0, Resp, X),
 	X == flagSector,
 	chatSectores(Atom, R).
 
-substitute([I|Index], Input, N, Resp, R):-
+replace0([I|Index], Input, N, Resp, R):-
 	length(Index, M), M =:= 0,
 	nth0(I, Input, Atom),
 	nth0(N, Resp, X),
 	X == flagPropuesta,
+	writeln(Atom),
 	chatPropuesta(_, Atom, R).
 
-substitute([I|Index], Input, N, Resp, R):-
+replace0([I|Index], Input, N, Resp, R):-
 	length(Index, M), M > 0,
 	nth0(I, Input, Atom),
 	nth0(N, Resp, X),
 	X == flagPropuesta,
 	chatPropuesta(Atom, _, R),
-	substitute(Index, Input, N, Resp, R).
+	writeln(Atom),
+	replace0(Index, Input, N, Resp, R).
 
-substitute([I|Index], Input, N, Resp, R):-
+replace0([I|Index], Input, N, Resp, R):-
 	nth0(I, Input, Atom),
 	select(N, Resp, Atom, R1), 
 	append(R1, [], R),!.
